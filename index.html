@@ -1,224 +1,166 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <title>Mission Dashboard – Aligned Rows</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>Account Tracker</title>
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f4f7fb;
+  padding: 20px;
+}
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+.row {
+  display: grid;
+  grid-template-columns: 220px 1fr 120px 120px 140px;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 14px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
 
-  <style>
-    :root{
-      --bg:#eef7ff;
-      --card:#ffffff;
-      --primary:#1e88ff;
-      --secondary:#4dd4ac;
-      --text:#0f172a;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --red:#ef4444;
-      --yellow:#facc15;
-      --green:#22c55e;
-    }
+.account-name {
+  font-weight: 600;
+}
 
-    *{box-sizing:border-box}
+.slider {
+  width: 100%;
+  height: 10px;
+  border-radius: 10px;
+  appearance: none;
+  background: green;
+  cursor: pointer;
+}
 
-    body{
-      margin:0;
-      background:linear-gradient(135deg,#eaf6ff,#f2fffb);
-      font-family:'Inter',sans-serif;
-      color:var(--text);
-      min-height:100vh;
-      padding:24px;
-    }
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #333;
+}
 
-    .topbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:20px;
-    }
-
-    .title{
-      font-family:'Orbitron',sans-serif;
-      font-size:1.3rem;
-      color:var(--primary);
-    }
-
-    .time{
-      font-family:'Orbitron',sans-serif;
-      color:var(--primary);
-    }
-
-    /* HEADER GRID */
-    .header-grid{
-      display:grid;
-      grid-template-columns:1.2fr 1fr 1fr 1fr;
-      gap:16px;
-      margin-bottom:10px;
-    }
-
-    .header-grid div{
-      background:var(--card);
-      border-radius:16px;
-      padding:14px;
-      text-align:center;
-      font-family:'Orbitron',sans-serif;
-      color:var(--primary);
-      box-shadow:0 6px 20px rgba(15,23,42,.08);
-    }
-
-    /* ROW GRID */
-    .rows{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .row{
-      display:grid;
-      grid-template-columns:1.2fr 1fr 1fr 1fr;
-      gap:16px;
-    }
-
-    .cell{
-      background:var(--card);
-      border-radius:14px;
-      padding:10px;
-      box-shadow:0 6px 20px rgba(15,23,42,.06);
-      min-height:64px;
-      display:flex;
-      align-items:center;
-    }
-
-    /* ACCOUNT */
-    .account-box{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      width:100%;
-    }
-
-    .account-box input[type=text]{
-      width:100%;
-      padding:7px 9px;
-      border-radius:8px;
-      border:1px solid var(--border);
-      font-family:'Orbitron',sans-serif;
-      font-size:.75rem;
-    }
-
-    /* KVM */
-    .kvm{
-      display:flex;
-      justify-content:space-between;
-    }
-
-    .kvm label{cursor:pointer}
-    .kvm input{display:none}
-
-    .dot{
-      width:14px;height:14px;border-radius:50%;border:2px solid var(--border)
-    }
-
-    .red:checked + .dot{background:var(--red)}
-    .yellow:checked + .dot{background:var(--yellow)}
-    .green:checked + .dot{background:var(--green)}
-
-    /* CHECKBOX */
-    .task{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:.8rem;
-    }
-
-    input[type=checkbox]{
-      width:18px;height:18px;accent-color:var(--secondary)
-    }
-
-    @media(max-width:1000px){
-      .header-grid,.row{grid-template-columns:1fr}
-    }
-  </style>
+.check {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+</style>
 </head>
+
 <body>
 
-<div class="topbar">
-  <div class="title">MISSION CONTROL DASHBOARD</div>
-  <div class="time" id="clock">--:--:-- WIB</div>
-</div>
-
-<div class="header-grid">
-  <div>ACCOUNT</div>
-  <div>INSTANCE</div>
-  <div>VESPER</div>
-  <div>ELUSION TRIAL</div>
-</div>
-
-<div class="rows" id="rows"></div>
+<div id="container"></div>
 
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
-  const ITEMS=15;
-  const TZ='Asia/Jakarta';
+const accounts = ["Account 1", "Account 2", "Account 3"];
 
-  /* CLOCK */
-  setInterval(()=>{
-    const now=new Date(new Date().toLocaleString('en-US',{timeZone:TZ}));
-    document.getElementById('clock').textContent=
-      now.toLocaleTimeString('id-ID',{hour12:false})+' WIB';
-  },1000);
+const container = document.getElementById("container");
 
-  const rows=document.getElementById('rows');
+// ================= RESET LOGIC =================
+function isNewDay(key) {
+  const last = localStorage.getItem(key);
+  const now = new Date();
+  if (!last) return true;
+  return new Date(last).toDateString() !== now.toDateString();
+}
 
-  for(let i=1;i<=ITEMS;i++){
-    const row=document.createElement('div');
-    row.className='row';
+function isNewWeek(key) {
+  const last = localStorage.getItem(key);
+  const now = new Date();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - now.getDay() + 1);
+  monday.setHours(5,0,0,0);
+  return !last || new Date(last) < monday;
+}
 
-    /* ACCOUNT : 3 COLORED CHECKBOX */
-    const acc=document.createElement('div');
-    acc.className='cell';
-    acc.innerHTML=`
-      <div class="account-box">
-        <input type="text" placeholder="Account ${i}" value="${localStorage.getItem('acc-'+i)||''}">
-        <div class="kvm">
-          <label><input type="checkbox" data-key="acc-${i}-red"><span class="dot red"></span></label>
-          <label><input type="checkbox" data-key="acc-${i}-yellow"><span class="dot yellow"></span></label>
-          <label><input type="checkbox" data-key="acc-${i}-green"><span class="dot green"></span></label>
-        </div>
-      </div>`;
+// ================= UI =================
+accounts.forEach((name, i) => {
+  const row = document.createElement("div");
+  row.className = "row";
 
-    acc.querySelector('input[type=text]').oninput=e=>{
-      localStorage.setItem('acc-'+i,e.target.value);
-    };
+  // Account name
+  const acc = document.createElement("div");
+  acc.className = "account-name";
+  acc.innerText = name;
 
-    acc.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-      cb.checked=localStorage.getItem(cb.dataset.key)==='1';
-      cb.onchange=()=>localStorage.setItem(cb.dataset.key,cb.checked?'1':'0');
-    });
+  // Slider
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = 0;
+  slider.max = 100;
+  slider.className = "slider";
 
-    /* SINGLE GREEN CHECKBOX CELLS */
-    function singleTask(prefix,label){
-      const c=document.createElement('div');
-      c.className='cell';
-      const key=`${prefix}-${i}`;
-      const checked=localStorage.getItem(key)==='1';
-      c.innerHTML=`<label class="task"><input type="checkbox" ${checked?'checked':''}> ${label}</label>`;
-      const cb=c.querySelector('input');
-      cb.onchange=()=>localStorage.setItem(key,cb.checked?'1':'0');
-      return c;
-    }
-
-    row.appendChild(acc);
-    row.appendChild(singleTask('instance','Done'));
-    row.appendChild(singleTask('vesper','Done'));
-    row.appendChild(singleTask('elusion','Done'));
-
-    rows.appendChild(row);
+  const sliderKey = `slider_${i}`;
+  if (isNewWeek(`slider_reset_${i}`)) {
+    slider.value = 0;
+    localStorage.setItem(sliderKey, 0);
+    localStorage.setItem(`slider_reset_${i}`, new Date());
+  } else {
+    slider.value = localStorage.getItem(sliderKey) || 0;
   }
+
+  function updateSliderColor(val) {
+    if (val <= 40) slider.style.background = "green";
+    else if (val <= 70) slider.style.background = "gold";
+    else slider.style.background = "red";
+  }
+  updateSliderColor(slider.value);
+
+  slider.oninput = e => {
+    localStorage.setItem(sliderKey, e.target.value);
+    updateSliderColor(e.target.value);
+  };
+
+  // Instance (daily)
+  const instance = document.createElement("input");
+  instance.type = "checkbox";
+  instance.className = "check";
+  const instKey = `instance_${i}`;
+  if (isNewDay(`inst_reset_${i}`)) {
+    instance.checked = false;
+    localStorage.setItem(instKey, false);
+    localStorage.setItem(`inst_reset_${i}`, new Date());
+  } else {
+    instance.checked = localStorage.getItem(instKey) === "true";
+  }
+  instance.onchange = () => localStorage.setItem(instKey, instance.checked);
+
+  // Vesper (weekly)
+  const vesper = document.createElement("input");
+  vesper.type = "checkbox";
+  vesper.className = "check";
+  const vesKey = `vesper_${i}`;
+  if (isNewWeek(`ves_reset_${i}`)) {
+    vesper.checked = false;
+    localStorage.setItem(vesKey, false);
+    localStorage.setItem(`ves_reset_${i}`, new Date());
+  } else {
+    vesper.checked = localStorage.getItem(vesKey) === "true";
+  }
+  vesper.onchange = () => localStorage.setItem(vesKey, vesper.checked);
+
+  // Elusion Trial (weekly)
+  const elusion = document.createElement("input");
+  elusion.type = "checkbox";
+  elusion.className = "check";
+  const eluKey = `elusion_${i}`;
+  if (isNewWeek(`elu_reset_${i}`)) {
+    elusion.checked = false;
+    localStorage.setItem(eluKey, false);
+    localStorage.setItem(`elu_reset_${i}`, new Date());
+  } else {
+    elusion.checked = localStorage.getItem(eluKey) === "true";
+  }
+  elusion.onchange = () => localStorage.setItem(eluKey, elusion.checked);
+
+  row.append(acc, slider, instance, vesper, elusion);
+  container.appendChild(row);
 });
 </script>
 
 </body>
 </html>
+
