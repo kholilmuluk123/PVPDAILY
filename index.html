@@ -2,290 +2,223 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard Mission WIB</title>
+  <title>Mission Dashboard – Aligned Rows</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg:#f4fbff;
+      --bg:#eef7ff;
       --card:#ffffff;
-      --accent:#0077ff;
-      --accent2:#00b36b;
-      --text:#0b1c2d;
-      --muted:#4a6fa5;
+      --primary:#1e88ff;
+      --secondary:#4dd4ac;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --red:#ef4444;
+      --yellow:#facc15;
+      --green:#22c55e;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
-      font-family:'Orbitron',sans-serif;
-      background:linear-gradient(135deg, #e6f9ff, #f0fff9);
-      color:#0b1c2d;
+      background:linear-gradient(135deg,#eaf6ff,#f2fffb);
+      font-family:'Inter',sans-serif;
+      color:var(--text);
       min-height:100vh;
-      padding:16px;
+      padding:24px;
     }
 
-    .header{
+    .topbar{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin-bottom:16px;
+      margin-bottom:20px;
+    }
+
+    .title{
+      font-family:'Orbitron',sans-serif;
+      font-size:1.3rem;
+      color:var(--primary);
     }
 
     .time{
-      font-size:1.4rem;
-      color:var(--accent);
+      font-family:'Orbitron',sans-serif;
+      color:var(--primary);
     }
 
-    .grid{
+    /* HEADER GRID */
+    .header-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:1.2fr 1fr 1fr 1fr;
+      gap:16px;
+      margin-bottom:10px;
+    }
+
+    .header-grid div{
+      background:var(--card);
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+      font-family:'Orbitron',sans-serif;
+      color:var(--primary);
+      box-shadow:0 6px 20px rgba(15,23,42,.08);
+    }
+
+    /* ROW GRID */
+    .rows{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .row{
+      display:grid;
+      grid-template-columns:1.2fr 1fr 1fr 1fr;
       gap:16px;
     }
 
-    .card{
-      background:linear-gradient(160deg, #ffffff, #eef6ff);
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 8px 25px rgba(0,0,0,.08);
-      min-height:600px; /* ±15 baris visual */
-    }
-
-    .card h2{
-      margin:0 0 12px 0;
-      color:var(--accent);
-      text-align:center;
+    .cell{
+      background:var(--card);
+      border-radius:14px;
+      padding:10px;
+      box-shadow:0 6px 20px rgba(15,23,42,.06);
+      min-height:64px;
+      display:flex;
+      align-items:center;
     }
 
     /* ACCOUNT */
-    .account-list{
+    .account-box{
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:6px;
+      width:100%;
     }
 
-    .account-input{
-      background:#ffffff;
-      border:2px solid #0b1c2d;
-      border-radius:10px;
-      padding:8px 10px;
-      color:#000000;
-      font-family:'Orbitron',sans-serif;
-      font-size:0.85rem;
-    }
-
-    .account-input::placeholder{
-      color:#555555;
-    }
-
-    .account-input:focus{
-      outline:none;
-      box-shadow:0 0 10px rgba(0,255,136,.6);
-    }
-
-    .account-name[contenteditable]{
-      outline:2px dashed var(--accent);
+    .account-box input[type=text]{
+      width:100%;
+      padding:7px 9px;
       border-radius:8px;
-      padding:6px;
+      border:1px solid var(--border);
+      font-family:'Orbitron',sans-serif;
+      font-size:.75rem;
     }
 
-    /* CHECKLIST */
-    .checklist{
-      list-style:none;
-      padding:0;
-      margin:0;
-    }
-
-    .checklist li{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 6px;
-      border-bottom:1px dashed rgba(255,255,255,.1);
-      font-size:0.85rem;
-    }
-
-    .checklist input{
-      width:20px;
-      height:20px;
-      accent-color:var(--accent2);
-    }
-
-    .footer-note{
-      margin-top:12px;
-      font-size:0.7rem;
-      color:var(--muted);
-      text-align:center;
-    }
-
-    @media(max-width:900px){
-      .grid{grid-template-columns:1fr}
-    }
-  
     /* KVM */
     .kvm{
       display:flex;
-      flex-direction:column-reverse;
-      gap:4px;
-      margin-left:8px;
+      justify-content:space-between;
     }
-    .kvm input{
-      width:18px;
-      height:18px;
-    }
-    .kvm-red{accent-color:#e63946;}
-    .kvm-yellow{accent-color:#f1c40f;}
-    .kvm-green{accent-color:#2ecc71;}
 
+    .kvm label{cursor:pointer}
+    .kvm input{display:none}
+
+    .dot{
+      width:14px;height:14px;border-radius:50%;border:2px solid var(--border)
+    }
+
+    .red:checked + .dot{background:var(--red)}
+    .yellow:checked + .dot{background:var(--yellow)}
+    .green:checked + .dot{background:var(--green)}
+
+    /* CHECKBOX */
+    .task{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:.8rem;
+    }
+
+    input[type=checkbox]{
+      width:18px;height:18px;accent-color:var(--secondary)
+    }
+
+    @media(max-width:1000px){
+      .header-grid,.row{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
 
-  <div class="header">
-    <div class="time" id="time">--:--:-- WIB</div>
-    <div class="time">Daily Reset 05:00 WIB</div>
-  </div>
+<div class="topbar">
+  <div class="title">MISSION CONTROL DASHBOARD</div>
+  <div class="time" id="clock">--:--:-- WIB</div>
+</div>
 
-  <div class="grid">
-    <!-- ACCOUNT -->
-    <div class="card">
-      <h2>ACCOUNT</h2>
-      <div class="account-list" id="accountList"></div>
-      <div class="footer-note">KVM per akun: pilih satu (merah / kuning / hijau)</div>
-      <div class="footer-note">Klik pada kotak untuk edit (tidak reset)</div>
-    </div>
+<div class="header-grid">
+  <div>ACCOUNT</div>
+  <div>INSTANCE</div>
+  <div>VESPER</div>
+  <div>ELUSION TRIAL</div>
+</div>
 
-    <!-- MISSION BOARD -->
-    <div class="card">
-      <h2>INSTANCE</h2>
-      <ul class="checklist" id="elusion"></ul>
-    </div>
-
-    <!-- ODIN BLESSING -->
-    <div class="card">
-      <h2>VESPER</h2>
-      <ul class="checklist" id="vesper"></ul>
-    </div>
-
-    <!-- INSTANCE -->
-    <div class="card">
-      <h2>ELUSION TRIAL</h2>
-      <ul class="checklist" id="instance"></ul>
-    </div>
-  </div>
+<div class="rows" id="rows"></div>
 
 <script>
-  const ITEMS = 15; // jumlah baris
-  const ZONE = 'Asia/Jakarta';
+document.addEventListener('DOMContentLoaded',()=>{
+  const ITEMS=15;
+  const TZ='Asia/Jakarta';
 
-  /* ===== ACCOUNT TEXTBOX ===== */
-  const accountList = document.getElementById('accountList');
-  if(accountList){
-    for(let i=1;i<=ITEMS;i++){
-      const row = document.createElement('div');
-      row.style.display='flex';
-      row.style.alignItems='center';
-      row.style.gap='6px';
-
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'account-input';
-      input.placeholder = 'Account ' + i;
-      const key = 'account-'+i;
-      input.value = // STORAGE TERPISAH (namespace khusus)
-localStorage.getItem(key) || '';
-      input.addEventListener('input',()=>{
-        // STORAGE TERPISAH (namespace khusus)
-localStorage.setItem(key,input.value);
-      });
-
-      const kvm = document.createElement('div');
-      kvm.className='kvm';
-      ['red','yellow','green'].forEach(color=>{
-        const cb=document.createElement('input');
-        cb.type='checkbox';
-        cb.className='kvm-'+color;
-        const k='kvm-'+i+'-'+color;
-        cb.checked = // STORAGE TERPISAH (namespace khusus)
-localStorage.getItem(k)==='1';
-        cb.addEventListener('change',()=>{
-          ['red','yellow','green'].forEach(c=>{
-            const kk='kvm-'+i+'-'+c;
-            if(c!==color){
-              // STORAGE TERPISAH (namespace khusus)
-localStorage.removeItem(kk);
-              const other=kvm.querySelector('.kvm-'+c);
-              if(other) other.checked=false;
-            }
-          });
-          // STORAGE TERPISAH (namespace khusus)
-localStorage.setItem(k,cb.checked?'1':'0');
-        });
-        kvm.appendChild(cb);
-      });
-
-      row.appendChild(input);
-      row.appendChild(kvm);
-      accountList.appendChild(row);
-    }
-    }
-  }
-
-  /* ===== CHECKLIST ===== */
-  const lists = {
-    instance: document.getElementById('instance'),
-    vesper: document.getElementById('vesper'),
-    elusion: document.getElementById('elusion')
-  };
-
-  function createChecklist(id){
-    lists[id].innerHTML='';
-    for(let i=1;i<=ITEMS;i++){
-      const li=document.createElement('li');
-      li.innerHTML=`<input type=\"checkbox\" data-key=\"${id}-${i}\"> <span>Task ${i}</span>`;
-      lists[id].appendChild(li);
-    }
-  }
-
-  Object.keys(lists).forEach(createChecklist);
-
-  document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-    cb.checked = // STORAGE TERPISAH (namespace khusus)
-localStorage.getItem(cb.dataset.key)==='1';
-    cb.addEventListener('change',()=>{
-      // STORAGE TERPISAH (namespace khusus)
-localStorage.setItem(cb.dataset.key, cb.checked?'1':'0');
-    });
-  });
-
-  /* ===== TIME WIB & RESET ===== */
-  function getWIB(){
-    return new Date(new Date().toLocaleString('en-US',{timeZone:ZONE}));
-  }
-
-  function updateTime(){
-    const now=getWIB();
-    document.getElementById('time').textContent=
+  /* CLOCK */
+  setInterval(()=>{
+    const now=new Date(new Date().toLocaleString('en-US',{timeZone:TZ}));
+    document.getElementById('clock').textContent=
       now.toLocaleTimeString('id-ID',{hour12:false})+' WIB';
+  },1000);
 
-    const lastReset=// STORAGE TERPISAH (namespace khusus)
-localStorage.getItem('lastReset');
-    const resetPoint=new Date(now);
-    resetPoint.setHours(5,0,0,0);
+  const rows=document.getElementById('rows');
 
-    if((!lastReset || new Date(lastReset)<resetPoint) && now>=resetPoint){
-      document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-        cb.checked=false;
-        // STORAGE TERPISAH (namespace khusus)
-localStorage.removeItem(cb.dataset.key);
-      });
-      // STORAGE TERPISAH (namespace khusus)
-localStorage.setItem('lastReset',now);
+  for(let i=1;i<=ITEMS;i++){
+    const row=document.createElement('div');
+    row.className='row';
+
+    /* ACCOUNT : 3 COLORED CHECKBOX */
+    const acc=document.createElement('div');
+    acc.className='cell';
+    acc.innerHTML=`
+      <div class="account-box">
+        <input type="text" placeholder="Account ${i}" value="${localStorage.getItem('acc-'+i)||''}">
+        <div class="kvm">
+          <label><input type="checkbox" data-key="acc-${i}-red"><span class="dot red"></span></label>
+          <label><input type="checkbox" data-key="acc-${i}-yellow"><span class="dot yellow"></span></label>
+          <label><input type="checkbox" data-key="acc-${i}-green"><span class="dot green"></span></label>
+        </div>
+      </div>`;
+
+    acc.querySelector('input[type=text]').oninput=e=>{
+      localStorage.setItem('acc-'+i,e.target.value);
+    };
+
+    acc.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+      cb.checked=localStorage.getItem(cb.dataset.key)==='1';
+      cb.onchange=()=>localStorage.setItem(cb.dataset.key,cb.checked?'1':'0');
+    });
+
+    /* SINGLE GREEN CHECKBOX CELLS */
+    function singleTask(prefix,label){
+      const c=document.createElement('div');
+      c.className='cell';
+      const key=`${prefix}-${i}`;
+      const checked=localStorage.getItem(key)==='1';
+      c.innerHTML=`<label class="task"><input type="checkbox" ${checked?'checked':''}> ${label}</label>`;
+      const cb=c.querySelector('input');
+      cb.onchange=()=>localStorage.setItem(key,cb.checked?'1':'0');
+      return c;
     }
-  }
 
-  setInterval(updateTime,1000);
-  updateTime();
+    row.appendChild(acc);
+    row.appendChild(singleTask('instance','Done'));
+    row.appendChild(singleTask('vesper','Done'));
+    row.appendChild(singleTask('elusion','Done'));
+
+    rows.appendChild(row);
+  }
+});
 </script>
+
 </body>
 </html>
