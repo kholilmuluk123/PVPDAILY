@@ -121,6 +121,22 @@
     @media(max-width:900px){
       .grid{grid-template-columns:1fr}
     }
+  
+    /* KVM */
+    .kvm{
+      display:flex;
+      flex-direction:column-reverse;
+      gap:4px;
+      margin-left:8px;
+    }
+    .kvm input{
+      width:18px;
+      height:18px;
+    }
+    .kvm-red{accent-color:#e63946;}
+    .kvm-yellow{accent-color:#f1c40f;}
+    .kvm-green{accent-color:#2ecc71;}
+
   </style>
 </head>
 <body>
@@ -135,19 +151,20 @@
     <div class="card">
       <h2>ACCOUNT</h2>
       <div class="account-list" id="accountList"></div>
+      <div class="footer-note">KVM per akun: pilih satu (merah / kuning / hijau)</div>
       <div class="footer-note">Klik pada kotak untuk edit (tidak reset)</div>
     </div>
 
     <!-- MISSION BOARD -->
     <div class="card">
       <h2>INSTANCE</h2>
-      <ul class="checklist" id="mission"></ul>
+      <ul class="checklist" id="elusion"></ul>
     </div>
 
     <!-- ODIN BLESSING -->
     <div class="card">
       <h2>VESPER</h2>
-      <ul class="checklist" id="odin"></ul>
+      <ul class="checklist" id="vesper"></ul>
     </div>
 
     <!-- INSTANCE -->
@@ -165,24 +182,60 @@
   const accountList = document.getElementById('accountList');
   if(accountList){
     for(let i=1;i<=ITEMS;i++){
+      const row = document.createElement('div');
+      row.style.display='flex';
+      row.style.alignItems='center';
+      row.style.gap='6px';
+
       const input = document.createElement('input');
       input.type = 'text';
       input.className = 'account-input';
       input.placeholder = 'Account ' + i;
       const key = 'account-'+i;
-      input.value = localStorage.getItem(key) || '';
+      input.value = // STORAGE TERPISAH (namespace khusus)
+localStorage.getItem(key) || '';
       input.addEventListener('input',()=>{
-        localStorage.setItem(key,input.value);
+        // STORAGE TERPISAH (namespace khusus)
+localStorage.setItem(key,input.value);
       });
-      accountList.appendChild(input);
+
+      const kvm = document.createElement('div');
+      kvm.className='kvm';
+      ['red','yellow','green'].forEach(color=>{
+        const cb=document.createElement('input');
+        cb.type='checkbox';
+        cb.className='kvm-'+color;
+        const k='kvm-'+i+'-'+color;
+        cb.checked = // STORAGE TERPISAH (namespace khusus)
+localStorage.getItem(k)==='1';
+        cb.addEventListener('change',()=>{
+          ['red','yellow','green'].forEach(c=>{
+            const kk='kvm-'+i+'-'+c;
+            if(c!==color){
+              // STORAGE TERPISAH (namespace khusus)
+localStorage.removeItem(kk);
+              const other=kvm.querySelector('.kvm-'+c);
+              if(other) other.checked=false;
+            }
+          });
+          // STORAGE TERPISAH (namespace khusus)
+localStorage.setItem(k,cb.checked?'1':'0');
+        });
+        kvm.appendChild(cb);
+      });
+
+      row.appendChild(input);
+      row.appendChild(kvm);
+      accountList.appendChild(row);
+    }
     }
   }
 
   /* ===== CHECKLIST ===== */
   const lists = {
-    mission: document.getElementById('mission'),
-    odin: document.getElementById('odin'),
-    instance: document.getElementById('instance')
+    instance: document.getElementById('instance'),
+    vesper: document.getElementById('vesper'),
+    elusion: document.getElementById('elusion')
   };
 
   function createChecklist(id){
@@ -197,9 +250,11 @@
   Object.keys(lists).forEach(createChecklist);
 
   document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-    cb.checked = localStorage.getItem(cb.dataset.key)==='1';
+    cb.checked = // STORAGE TERPISAH (namespace khusus)
+localStorage.getItem(cb.dataset.key)==='1';
     cb.addEventListener('change',()=>{
-      localStorage.setItem(cb.dataset.key, cb.checked?'1':'0');
+      // STORAGE TERPISAH (namespace khusus)
+localStorage.setItem(cb.dataset.key, cb.checked?'1':'0');
     });
   });
 
@@ -213,16 +268,19 @@
     document.getElementById('time').textContent=
       now.toLocaleTimeString('id-ID',{hour12:false})+' WIB';
 
-    const lastReset=localStorage.getItem('lastReset');
+    const lastReset=// STORAGE TERPISAH (namespace khusus)
+localStorage.getItem('lastReset');
     const resetPoint=new Date(now);
     resetPoint.setHours(5,0,0,0);
 
     if((!lastReset || new Date(lastReset)<resetPoint) && now>=resetPoint){
       document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
         cb.checked=false;
-        localStorage.removeItem(cb.dataset.key);
+        // STORAGE TERPISAH (namespace khusus)
+localStorage.removeItem(cb.dataset.key);
       });
-      localStorage.setItem('lastReset',now);
+      // STORAGE TERPISAH (namespace khusus)
+localStorage.setItem('lastReset',now);
     }
   }
 
